@@ -1,0 +1,37 @@
+syntax: glob
+build
+.idea
+Include
+Lib
+Scripts
+bin
+lib
+include
+share
+*.pdf
+*.tex
+*~
+*.pyc
+*.aux
+*.log
+*.out
+*.toc
+*.sqlite
+*.db
+*.orig
+local_settings.py
+local_hacks.py
+local_fixtures
+source/data/
+*cache
+*.sqlite3
+*.jpg
+*.csv
+*.jpeg
+*.tmp
+*.png
+secret.py
+
+temp
+syntax: regexp
+^static/
