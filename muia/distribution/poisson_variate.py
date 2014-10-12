@@ -21,3 +21,20 @@ class PoissonVariate(Distribution):
             p = p * self._engine.random()
             k += 1
         return k - 1
+
+def test():
+    print("Poisson Distribution")
+
+    import random
+    lambd = 4
+    generator = PoissonVariate(lambd, random.Random())
+
+    n = 10
+    print(" - generate %r random number from Poisson(%r)" % (n, lambd))
+    i = 0
+    while i<n:
+        print("\t\t %r" % generator.random())
+        i +=1
+
+if __name__ == "__main__":
+    test()

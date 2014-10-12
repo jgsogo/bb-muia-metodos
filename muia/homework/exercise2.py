@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-from muia.distribution.poisson_variate import PoissonVariate, DiscreteVariate
-from .client_manager import ClientManager
+from muia.distribution import PoissonVariate, DiscreteVariate
+from .warehouse.client_manager import ClientManager
 
 
 def get_client_manager(random_engine):
@@ -20,3 +20,10 @@ def get_client_manager(random_engine):
     client_manager.set_demand(DiscreteVariate, prob_list=[(0.3, 1), (0.4, 2), (0.2, 3), (0.1, 4)])
 
     return client_manager
+
+
+def run():
+    print("Exercise 1.2")
+
+if __name__ == "__main__":
+    run()

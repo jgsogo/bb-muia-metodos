@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import random
 
 class Distribution(object):
     _engine = None
