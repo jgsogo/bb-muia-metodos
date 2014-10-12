@@ -5,8 +5,8 @@ from .base import Distribution
 
 class NormalVariate(Distribution):
 
-    def __init__(self, mu, sigma, engine_class, seed=None):
-        super(NormalVariate, self).__init__(engine_class, seed)
+    def __init__(self, mu, sigma, random_engine):
+        super(NormalVariate, self).__init__(random_engine)
         self._mu = mu
         self._sigma = sigma
 

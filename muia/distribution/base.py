@@ -6,10 +6,8 @@ import random
 class Distribution(object):
     _engine = None
 
-    def __init__(self, engine_class, seed=None):
-        self._engine = engine_class() if engine_class else random.Random()
-        if seed:
-            self._engine.seed(seed)
+    def __init__(self, random_engine):
+        self._engine = random_engine
 
     def random(self):
         raise NotImplementedError("Each distribution must provide its generation implementation")

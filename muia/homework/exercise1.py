@@ -3,6 +3,7 @@
 
 """
 Generación	de números y variables aleatorias.
+---------------------------------------------
 
 Utilizando el método del girador de Mersenne obtener una secuencia de 5000 números aleatorios en (0,1)
 y estudiar su aleatoriedad utilizando la variante de Knuth del Test de Póker.
