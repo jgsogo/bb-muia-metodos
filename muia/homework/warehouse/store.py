@@ -6,11 +6,12 @@ class Store(object):
                             # TODO: ¿Cuál es la unidad de tiempo? En otras partes se habla de horas...
 
     def __init__(self, initial_stock, on_stock_change=None):
-        self._stock = initial_stock
+        self._initial_stock = initial_stock
+        self._stock = self._initial_stock
         self._on_stock_change = on_stock_change
 
-    def reset(self, quantity):
-        self._stock = quantity
+    def reset(self):
+        self._stock = self._initial_stock
 
     def set_on_stock_change(self, on_stock_change):
         self._on_stock_change = on_stock_change
