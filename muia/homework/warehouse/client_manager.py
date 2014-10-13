@@ -16,11 +16,11 @@ class ClientManager(object):
 
     def set_arrival(self, distribution_class, **kwargs):
         assert issubclass(distribution_class, Distribution), "Not a distribution"
-        self._arrival_distribution = distribution_class(self._engine, **kwargs)
+        self._arrival_distribution = distribution_class(random_engine=self._engine, **kwargs)
 
     def set_demand(self, distribution_class, **kwargs):
         assert issubclass(distribution_class, Distribution), "Not a distribution"
-        self._demand_distribution = distribution_class(self._engine, **kwargs)
+        self._demand_distribution = distribution_class(random_engine=self._engine, **kwargs)
 
     def next_hour(self):
         # Returns (n_clients, (client_1, client_2, ...)) tuple

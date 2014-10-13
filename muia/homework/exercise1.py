@@ -18,3 +18,24 @@ from muia.random.test import PokerKnuth
 
 
 
+def run():
+    print("="*10)
+    print("== Exercise 1.1")
+    print("="*10)
+
+    # 1) Generar 5000 números utilizando el generador de Mersene
+    n = 5000
+    print("\nGenerate %r random numbers using Mersene Twister" % n)
+    generator = MersenneTwisterEngine()
+    data = [generator.random() for i in xrange(n)]
+
+    # 2) Aplicar el test de póker a este generador
+
+    # 3) Wichmann-Hill
+
+
+if __name__ == "__main__":
+    run()
+
+
+

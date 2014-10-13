@@ -23,12 +23,20 @@ def test():
     sigma = 1.0
     generator = NormalVariate(mu, sigma, random.Random())
 
-    n = 10
+    n = 1000
     print(" - generate %r random number from N(%r, %r)" % (n, mu, sigma))
-    i = 0
-    while i<n:
-        print("\t\t %r" % generator.random())
-        i +=1
+    data = [generator.random() for i in xrange(n)]
+    try:
+        import matplotlib.pyplot as plt
+        import numpy as np
+        # TODO: Implement histogram with numpy and plot
+    except ImportError:
+        import math
+        mean = sum(data)/n
+        sd = math.sqrt(sum((x-mean)**2 for x in data)/n)
+        print("   + mean: %s" % (mean))
+        print("   + std dev: %s" % (sd))
+
 
 if __name__ == "__main__":
     test()
