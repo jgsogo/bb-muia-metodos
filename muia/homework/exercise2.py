@@ -194,57 +194,6 @@ def case_C(seed):
     print("\t - Expected revenue:\t%s\t(rms=%s)" % (expected_revenue[0], expected_revenue[1]))
     """
 
-    """
-    # 1) Modificando el stock máximo
-    max_max_stock = 150
-    min_min_stock = 0
-    initial_min_stock = 30
-
-    print("\n\tMaximum stock in [%s:%s:%s] and min_stock=%r" % (initial_min_stock, stock_step, max_max_stock, initial_min_stock))
-    all_data_stock = {}
-    max_revenue = (-1, -1)
-    for max_stock in range(initial_min_stock, max_max_stock+1, stock_step):
-        random_engine.seed(seed) # Reset random
-        sim.config(minimum_stock=initial_min_stock, max_stock=max_stock) # Reconfig with max_stock
-
-        data = sim.run_repeated(t_end, n_times)
-
-        total_clients, fully_served, mean_stock, expected_revenue = mean_stats(data)
-        if expected_revenue[0] > max_revenue[1]:
-            max_revenue = (max_stock, expected_revenue[0])
-
-        print("\t - max_stock: %s\trevenue: %s\tstock (mean): %s\tserved: %s%%" %
-              (max_stock,
-               "{:2.2f}".format(expected_revenue[0]),
-               mean_stock[0],
-               "{:2.2f}".format(fully_served[0]/float(total_clients[0])*100)))
-        all_data_stock.update({max_stock: data})
-    print("\tMaximum revenue is %r with max_stock %r" % ("{:2.2f}".format(max_revenue[1]), max_revenue[0]))
-
-    # 2) Modificando el mínimo stock
-    max_stock = max_revenue[0]
-    max_min_stock = max_stock
-    print("\n\tMinimun stock in [%s:%s:%s] and max_stock=%r" % (min_min_stock, stock_step, max_min_stock, max_stock))
-    all_data_stock_min = {}
-    max_revenue = (-1, -1)
-    for minimum_stock in range(min_min_stock, max_min_stock+1, stock_step):
-        random_engine.seed(seed) # Reset random
-        sim.config(minimum_stock=minimum_stock, max_stock=max_stock) # Reconfig with max_stock
-
-        data = sim.run_repeated(t_end, n_times)
-
-        total_clients, fully_served, mean_stock, expected_revenue = mean_stats(data, n_times)
-        if expected_revenue[0] > max_revenue[1]:
-            max_revenue = (minimum_stock, expected_revenue[0])
-
-        print("\t - min_stock: %s\trevenue: %s\tstock (mean): %s\tserved: %s%%" %
-              (minimum_stock,
-               "{:2.2f}".format(expected_revenue[0]),
-               mean_stock[0],
-               "{:2.2f}".format(fully_served[0]/float(total_clients[0])*100)))
-        all_data_stock_min.update({max_stock: data})
-    print("\tMaximum revenue is %r with min_stock %r" % ("{:2.2f}".format(max_revenue[1]), max_revenue[0]))
-    """
 
 
 def run():
