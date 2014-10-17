@@ -24,3 +24,18 @@ except AttributeError:
 
         def jumpahead(self):
             pass
+
+
+def test_poker_knuth(n=5000):
+    print("Test de poker. Variante Knuth")
+    print("\t - random sample size: %s" % n)
+
+    generator = WichmannHill()
+    numbers = [generator.random() for i in range(n)]
+    from .test.poker_knuth import gestionaPokerKnuth
+    result = gestionaPokerKnuth(listaRegistrosNumeros=numbers)
+    print result
+
+
+if __name__ == "__main__":
+    test_poker_knuth()
