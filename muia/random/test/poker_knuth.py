@@ -15,9 +15,7 @@ def printMatrix(a):
 
 def transformaEnteros ( numero):
     ### Recibe un numero, en el rango [0, 1] y retorna su correspondiente en el rango [1 , 10]####
-    if numero > 1 :
-        return numero+2
-    elif numero >= 0 and numero < 0.1 :
+    if numero >= 0 and numero < 0.1 :
         return 1
     elif numero >= 0.1 and numero < 0.2 :
         return 2
@@ -175,6 +173,13 @@ def funcionTroceaLista(tamanoTrozo,lista):
 
     return salida
 
+def calculaFrecuenciaEsperada(n_iteraciones,categoria):
+    ### Estima la frecuencia esperada dada una categoria y un numero de observaciones realizadas
+    #  Se espera que el numero de la categoria se ubique entre [1 , 5]
+    # ###
+    probabilidadesPorCategoria = [ 0.0001 ,0.0135 ,0.18 ,0.504,0.3024 ]
+    return (n_iteraciones*probabilidadesPorCategoria[categoria-1])
+
 def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
     infile = None
     lineas = None
@@ -204,8 +209,28 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
 
     map( imprime , frecuenciasObservadas )
 
+
+    n_iteraciones = 0
+    for valor in frecuenciasObservadas:
+        n_iteraciones = (n_iteraciones+ valor)
+
+    i_esima_categoria =1
+    chi_cuadrado = 0
+    frecuenciaEsperadaAux=0
+    for frecuenciaCategoria in frecuenciasObservadas:
+        imprime("Clase")
+        imprime(i_esima_categoria,"%d")
+        frecuenciaEsperadaAux=calculaFrecuenciaEsperada(n_iteraciones,i_esima_categoria)
+        imprime("mi frecuencia esperada es")
+        imprime(frecuenciaEsperadaAux,"%f")
+        chi_cuadrado = (chi_cuadrado +   ((((frecuenciaCategoria - frecuenciaEsperadaAux)) **2) / frecuenciaEsperadaAux ))
+        imprime("mi chi cuadrado temporal es")
+        imprime(chi_cuadrado,"%f")
+        i_esima_categoria = (i_esima_categoria+1)
+
+    imprime("mi chi cuadrado temporal es")
+    imprime(chi_cuadrado,"%f")
     ###Voy por aqui!!!
-    ###TODO  Falta Sumatoria de ((FrecuenciaObservada - FrecuenciaEsperada) 2) / FrecuenciaEsperada
     ### El grado de libertad: k - r - 1 = 5 - 0 - 1 = 4
     ###TODO Comparar con tabla X 2
     ###TODO Evaluar la hipotesis de Poker_Knuth .Con cual probabilidad?
@@ -216,7 +241,5 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
         # Cerramos el fichero.
         infile.close();
 
-
-if __name__ == "__main__":
-    direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
-    gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
+direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
+gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
