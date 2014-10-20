@@ -1,3 +1,3 @@
 
 from .wichmann_engine import WichmannHill
-from .mersene_twister_engine import MersenneTwisterEngine
+from .mersenne_twister_engine import MersenneTwisterEngine

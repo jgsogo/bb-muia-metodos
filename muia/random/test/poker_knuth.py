@@ -248,6 +248,9 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
         # Cerramos el fichero.
         infile.close()
 
+    return 0
+
+
 if __name__=='__main__':
     direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
     gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
