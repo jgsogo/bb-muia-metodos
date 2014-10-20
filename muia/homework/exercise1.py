@@ -59,6 +59,8 @@ def run():
 
     #   - random numbers generated with C++
     sys.stdout.write("\n\t1.2) Mersenne Twister Engine C++ (std::mt19937)\n")
+    dir_files = './muia/homework/mersenne_c_files/*'
+
     class FilePoker():
         file_it = None
         file = None
@@ -66,7 +68,9 @@ def run():
 
         def __init__(self):
             import glob
-            self.files = glob.glob('./muia/homework/mersenne_c_files/*')
+            self.files = glob.glob(dir_files)
+            if not len(self.files):
+                raise AttributeError("There are no files in %r" % dir_files)
 
         def load_file(self):
             self.i_file += 1
