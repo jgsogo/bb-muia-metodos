@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'jonathan'
+import sys
 
-def imprime(dato,formato = " %s "):
-    print (formato % dato)
+
+def imprime(dato, formato = " %s ", end='\n'):
+    sys.stdout.write((formato + end) % dato)
 
 def printMatrix(a):
     for i in range(len(a)):
@@ -36,7 +38,8 @@ def transformaEnteros ( numero):
     elif numero >= 0.9 and numero <= 1 :
         return 10
     else:
-        return numero
+        raise AttributeError("Value %r not in range [0, 1]" % numero)
+
 
 def remueveNApariciones(lista,elemento):
     ### Funcion auxiliar que elimina los primeros elementos de una lista
@@ -217,16 +220,20 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
     i_esima_categoria =1
     chi_cuadrado = 0
     frecuenciaEsperadaAux=0
+
+    data = []
     for frecuenciaCategoria in frecuenciasObservadas:
-        imprime("Clase")
-        imprime(i_esima_categoria,"%d")
         frecuenciaEsperadaAux=calculaFrecuenciaEsperada(n_iteraciones,i_esima_categoria)
-        imprime("mi frecuencia esperada es")
-        imprime(frecuenciaEsperadaAux,"%f")
         chi_cuadrado = (chi_cuadrado +   ((((frecuenciaCategoria - frecuenciaEsperadaAux)) **2) / frecuenciaEsperadaAux ))
-        imprime("mi chi cuadrado temporal es")
-        imprime(chi_cuadrado,"%f")
+
+        data.append((i_esima_categoria, frecuenciaEsperadaAux, chi_cuadrado))
         i_esima_categoria = (i_esima_categoria+1)
+
+    imprime("")
+    imprime("Clase\tfreq\tChi")
+    for it in data:
+        imprime("%s\t%s\t%s" % it)
+    imprime("")
 
     imprime("mi chi cuadrado temporal es")
     imprime(chi_cuadrado,"%f")
@@ -239,7 +246,8 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
 
     if ficheroRegistrosNumeros != None:
         # Cerramos el fichero.
-        infile.close();
+        infile.close()
 
-direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
-gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
+if __name__=='__main__':
+    direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
+    gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
