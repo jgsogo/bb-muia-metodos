@@ -31,6 +31,8 @@ source/data/
 *.tmp
 *.png
 secret.py
+muia/homework/mersenne_c_files/
+muia/c_mersenne_twister
 
 temp
 syntax: regexp

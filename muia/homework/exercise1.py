@@ -44,20 +44,52 @@ def run():
     sys.stdout.write("\n== Exercise 1.1\n")
     sys.stdout.write("="*10)
 
-    # 1) Generar 5000 números utilizando el generador de Mersene
+
+    # 1) Generar 5000 números utilizando el generador de Mersenne
     sys.stdout.write("\n1) Mersenne Twister Engine\n")
     n = 5000
-    n_series = 1
+    n_series = 100
     #   - default random.Random (it's Mersenne since 2.x
     sys.stdout.write("\n\t1.1) Mersenne Twister Engine (default Python implementation)\n")
     apply_poker_knuth(MersenneTwisterEngine, n=n, n_series=n_series)
 
-
-    #   - our implementation of Mersenne Twistter
+    #   - our implementation of Mersenne Twister
     sys.stdout.write("\n\t1.2) Mersenne Twister Engine (implementation MUIA)\n")
     apply_poker_knuth(MUIA_MersenneTwisterEngine, n=n, n_series=n_series)
 
-    # 2) Aplicar el test de póker a este generador
+    #   - random numbers generated with C++
+    sys.stdout.write("\n\t1.2) Mersenne Twister Engine C++ (std::mt19937)\n")
+    class FilePoker():
+        file_it = None
+        file = None
+        i_file = -1
+
+        def __init__(self):
+            import glob
+            self.files = glob.glob('./muia/homework/mersenne_c_files/*')
+
+        def load_file(self):
+            self.i_file += 1
+            self.file = self.files[self.i_file]
+            filename = "%s" % self.file
+            self.file = open(filename, 'r')
+            #print "\n\nLoaded: %s" % filename
+
+        def random(self):
+            if not self.file:
+                self.load_file()
+
+            dato = None
+            try:
+                dato = float(self.file.readline().strip())
+            except ValueError:
+                self.file = None
+                dato = self.random()
+            finally:
+                return dato
+
+    apply_poker_knuth(FilePoker, n=n, n_series=n_series)
+
 
     # 3) Wichmann-Hill
 
