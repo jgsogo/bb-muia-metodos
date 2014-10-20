@@ -242,13 +242,13 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
     ###TODO Comparar con tabla X 2
     ###TODO Evaluar la hipotesis de Poker_Knuth .Con cual probabilidad?
 
-
+    pasa_el_contraste = chi_cuadrado < chi_teorica # <<-- esto es un booleano, que indica si pasa el contraste
 
     if ficheroRegistrosNumeros != None:
         # Cerramos el fichero.
         infile.close()
 
-    return 0
+    return chi_cuadrado, pasa_el_contraste # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
 
 
 if __name__=='__main__':
