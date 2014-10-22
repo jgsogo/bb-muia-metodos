@@ -17,7 +17,7 @@ import time
 import sys
 import math
 from muia.random.mersenne_twister_engine import MersenneTwisterEngine, MUIA_MersenneTwisterEngine
-from muia.random.test.poker_knuth import gestionaPokerKnuth as poker_knuth_test
+from muia.random.test.poker_knuth import PokerKnuth
 
 
 def apply_poker_knuth(generator_class, n=5000, n_series=100):
@@ -28,15 +28,26 @@ def apply_poker_knuth(generator_class, n=5000, n_series=100):
     elapsed = time.time() - t
     sys.stdout.write(" (%.6f seconds)\n" % elapsed)
 
+    poker_knuth = PokerKnuth(chi2_file='muia/random/test/tablaChiCuadrado.csv', verbosity=0)
     xi2 = []
     for series in data:
-        xi2.append(poker_knuth_test(listaRegistrosNumeros=series, chi2_file='muia/random/test/tablaChiCuadrado.csv'))
-    # TODO: ¿Podemos suponer una distribución normal?
+        xi2.append(poker_knuth.gestionaPokerKnuth(listaRegistrosNumeros=series))
+
     n_xi2 = len(xi2)
+    n_success = sum([it[1] for it in xi2])
+
+    sys.stdout.write("\t\t+ succeded : %s/%s times\n" % (n_success, n_xi2))
+    # TODO: ¿Podemos suponer una distribución normal?
     mean = sum([it[0] for it in xi2])/n_xi2
     sd = math.sqrt(sum((x[0]-mean)**2 for x in xi2)/n_xi2)
     sys.stdout.write("\t\t+ mean: %s\n" % (mean))
     sys.stdout.write("\t\t+ std dev: %s\n" % (sd))
+    return xi2
+
+
+def print_results(filename, r):
+    with open(filename, 'w') as f:
+        [f.write("%s\n" % it[0]) for it in r]
 
 
 def run():
@@ -48,14 +59,16 @@ def run():
     # 1) Generar 5000 números utilizando el generador de Mersenne
     sys.stdout.write("\n1) Mersenne Twister Engine\n")
     n = 5000
-    n_series = 1
+    n_series = 100
     #   - default random.Random (it's Mersenne since 2.x
     sys.stdout.write("\n\t1.1) Mersenne Twister Engine (default Python implementation)\n")
-    apply_poker_knuth(MersenneTwisterEngine, n=n, n_series=n_series)
+    r1 = apply_poker_knuth(MersenneTwisterEngine, n=n, n_series=n_series)
+    print_results('mersenne_chi2_python.txt', r1)
 
     #   - our implementation of Mersenne Twister
     sys.stdout.write("\n\t1.2) Mersenne Twister Engine (implementation MUIA)\n")
-    apply_poker_knuth(MUIA_MersenneTwisterEngine, n=n, n_series=n_series)
+    r2 = apply_poker_knuth(MUIA_MersenneTwisterEngine, n=n, n_series=n_series)
+    print_results('mersenne_chi2_muia.txt', r2)
 
     #   - random numbers generated with C++
     sys.stdout.write("\n\t1.2) Mersenne Twister Engine C++ (std::mt19937)\n")
@@ -92,8 +105,8 @@ def run():
             finally:
                 return dato
 
-    apply_poker_knuth(FilePoker, n=n, n_series=n_series)
-
+    r3 = apply_poker_knuth(FilePoker, n=n, n_series=n_series)
+    print_results('mersenne_chi2_cpp.txt', r3)
 
     # 3) Wichmann-Hill
 
