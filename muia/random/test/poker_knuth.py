@@ -183,6 +183,45 @@ def calculaFrecuenciaEsperada(n_iteraciones,categoria):
     probabilidadesPorCategoria = [ 0.0001 ,0.0135 ,0.18 ,0.504,0.3024 ]
     return (n_iteraciones*probabilidadesPorCategoria[categoria-1])
 
+#def cargaTablaChiCuadrado():
+def cargaTablaChiCuadrado(cuartil,fichero_chi = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/tablaChiCuadrado.csv"):
+    tablaChi = []
+    infile = open(fichero_chi, "r");
+    lineas = infile.readlines()
+
+    cuentaFilas=0
+
+    for linea in lineas:
+        # imprime("**** imprime lineas *****")
+        # imprime(linea)
+        aux= linea.split(";")
+        auxFloat = []
+        for dato in aux:
+            # imprime("**** imprime datos *****")
+            # imprime(dato," %s ")
+            if cuentaFilas == 0 : #Las cabeceras de la tabla
+                cuartil.append( dato )
+            else:
+                auxFloat.append( dato )
+        if cuentaFilas != 0 : #Las NO cabeceras de la tabla
+            map( float, auxFloat)
+            tablaChi.append( auxFloat )
+        cuentaFilas = cuentaFilas+1
+
+    #printMatrix( tablaChi )
+    infile.close()
+    return tablaChi
+
+def getIndiceGradoLibertad(cabeceras_cuartil,x1_a):
+    indice =0
+    for dato in cabeceras_cuartil:
+        if dato == x1_a:
+            return indice
+        indice = indice+1
+    indice =-1
+    return indice
+
+
 def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
     infile = None
     lineas = None
@@ -237,12 +276,41 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
 
     imprime("mi chi cuadrado temporal es")
     imprime(chi_cuadrado,"%f")
-    ###Voy por aqui!!!
-    ### El grado de libertad: k - r - 1 = 5 - 0 - 1 = 4
-    ###TODO Comparar con tabla X 2
-    ###TODO Evaluar la hipotesis de Poker_Knuth .Con cual probabilidad?
 
-    pasa_el_contraste = chi_cuadrado < chi_teorica # <<-- esto es un booleano, que indica si pasa el contraste
+    ### El grado de libertad: k - r - 1 = 5 - 0 - 1 = 4
+    grado_libertad = clases - 0 - 1
+    probabilidad = "0.995"
+
+    cabecera_cuartiles=[]
+    tablaChi = cargaTablaChiCuadrado( cabecera_cuartiles )
+    #map(imprime,cabecera_cuartiles)
+    indice_x1_a = getIndiceGradoLibertad(cabecera_cuartiles,probabilidad)
+    chi_teorica = tablaChi[grado_libertad-1][indice_x1_a]#los indices inician en 0: grado_libertad-1
+    imprime("Con un grado de libertad: ",formato =" %s",end="")
+    imprime(grado_libertad,formato =" %d ")
+    imprime("Con una probabilidad: ",formato =" %s",end="")
+    imprime(probabilidad,formato =" %s ")
+    imprime("mientras que la chi de referencia es ",formato =" %s ",end="")
+    imprime(chi_teorica,formato =" %s ")
+
+    pasa_el_contraste = (chi_teorica < chi_cuadrado)
+
+    imprime( "Si chi_teorica < chi_cuadrado, se acepta o no la hipotesis" )
+
+    if pasa_el_contraste :
+        #imprime( "Entonces: %f < %f " % chiss )
+        imprime( "Entonces: ",formato="%s",end="" )
+        imprime(float(chi_teorica),formato="%f",end=" " )
+        imprime( " < ",formato="%s",end="" )
+        imprime(chi_cuadrado,formato="%f",end="\n" )
+        imprime("Se acepta la hipotesis!")
+    else:
+        #imprime( "Entonces: %f >= %f " % chiss )
+        imprime( "Entonces: ",formato="%s",end="" )
+        imprime(float(chi_teorica),formato="%f",end=" " )
+        imprime( " >= ",formato="%s",end="" )
+        imprime(chi_cuadrado,formato="%f",end="\n" )
+        imprime("No se acepta la hipotesis!")
 
     if ficheroRegistrosNumeros != None:
         # Cerramos el fichero.
@@ -254,3 +322,5 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
 if __name__=='__main__':
     direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
     gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
+
+
