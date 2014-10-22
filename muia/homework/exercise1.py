@@ -30,11 +30,11 @@ def apply_poker_knuth(generator_class, n=5000, n_series=100):
 
     xi2 = []
     for series in data:
-        xi2.append(poker_knuth_test(listaRegistrosNumeros=series))
+        xi2.append(poker_knuth_test(listaRegistrosNumeros=series, chi2_file='muia/random/test/tablaChiCuadrado.csv'))
     # TODO: ¿Podemos suponer una distribución normal?
     n_xi2 = len(xi2)
-    mean = sum(xi2)/n_xi2
-    sd = math.sqrt(sum((x-mean)**2 for x in xi2)/n_xi2)
+    mean = sum([it[0] for it in xi2])/n_xi2
+    sd = math.sqrt(sum((x[0]-mean)**2 for x in xi2)/n_xi2)
     sys.stdout.write("\t\t+ mean: %s\n" % (mean))
     sys.stdout.write("\t\t+ std dev: %s\n" % (sd))
 
@@ -48,7 +48,7 @@ def run():
     # 1) Generar 5000 números utilizando el generador de Mersenne
     sys.stdout.write("\n1) Mersenne Twister Engine\n")
     n = 5000
-    n_series = 100
+    n_series = 1
     #   - default random.Random (it's Mersenne since 2.x
     sys.stdout.write("\n\t1.1) Mersenne Twister Engine (default Python implementation)\n")
     apply_poker_knuth(MersenneTwisterEngine, n=n, n_series=n_series)

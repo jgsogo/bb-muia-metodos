@@ -184,7 +184,7 @@ def calculaFrecuenciaEsperada(n_iteraciones,categoria):
     return (n_iteraciones*probabilidadesPorCategoria[categoria-1])
 
 #def cargaTablaChiCuadrado():
-def cargaTablaChiCuadrado(cuartil,fichero_chi = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/tablaChiCuadrado.csv"):
+def cargaTablaChiCuadrado(cuartil,fichero_chi):
     tablaChi = []
     infile = open(fichero_chi, "r");
     lineas = infile.readlines()
@@ -222,12 +222,16 @@ def getIndiceGradoLibertad(cabeceras_cuartil,x1_a):
     return indice
 
 
-def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
+def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None, chi2_file=None):
     infile = None
     lineas = None
     clases = 5
+    if not chi2_file:
+        imprime("Imposible empezar sin la tabla chi2")
+        return -1
     if ficheroRegistrosNumeros == None and listaRegistrosNumeros==None :
         imprime("Imposible empezar sin la entrada de numeros en lista o fichero"," %s ")
+        return -1
     elif ficheroRegistrosNumeros != None:
         imprime( "Calculando el Poker_knuth a partir de un fichero como entrada", " %s " )
         infile = open(ficheroRegistrosNumeros, "r");
@@ -282,7 +286,7 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
     probabilidad = "0.995"
 
     cabecera_cuartiles=[]
-    tablaChi = cargaTablaChiCuadrado( cabecera_cuartiles )
+    tablaChi = cargaTablaChiCuadrado( cabecera_cuartiles, chi2_file )
     #map(imprime,cabecera_cuartiles)
     indice_x1_a = getIndiceGradoLibertad(cabecera_cuartiles,probabilidad)
     chi_teorica = tablaChi[grado_libertad-1][indice_x1_a]#los indices inician en 0: grado_libertad-1
@@ -321,6 +325,7 @@ def gestionaPokerKnuth(ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
 
 if __name__=='__main__':
     direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
-    gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero)
+    xi2_file = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/tablaChiCuadrado.csv"
+    gestionaPokerKnuth( ficheroRegistrosNumeros=direccion_fichero, xi2_file=xi2_file)
 
 
