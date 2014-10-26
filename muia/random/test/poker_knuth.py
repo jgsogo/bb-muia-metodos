@@ -190,7 +190,6 @@ class PokerKnuth(object):
         probabilidadesPorCategoria = [ 0.0001 ,0.0135 ,0.18 ,0.504,0.3024 ]
         return (n_iteraciones*probabilidadesPorCategoria[categoria-1])
 
-    #def cargaTablaChiCuadrado():
     def cargaTablaChiCuadrado(self, cuartil, fichero_chi):
         tablaChi = []
         infile = open(fichero_chi, "r");
@@ -227,6 +226,22 @@ class PokerKnuth(object):
             indice = indice+1
         indice =-1
         return indice
+
+    def getCuartil(self,chiObservado,gradoLibertad,tablaChi):
+        ### En caso que no se acepte el chiObservado porque sea menor a los chiTeoricos, se retorna -1 como indice###
+        chiTeoricosParaMiGrado = tablaChi[ gradoLibertad-1 ][1:] #El primer valor de la fila se corresponde al grado de libertad, por eso no lo queremos
+        esHayado=False
+        indiceUltimoMayor=0 #Será el indice del maximo alpha para el que se acepta el chiObservado
+        for chiTeorico in chiTeoricosParaMiGrado:
+#            self.imprime("Valor a comparar")
+ #           self.imprime(chiTeorico,formato =" %s ")
+            if float(chiTeorico) >= chiObservado:
+                esHayado=True
+                break
+            indiceUltimoMayor = indiceUltimoMayor+1
+        if not esHayado :
+            indiceUltimoMayor = -1
+        return indiceUltimoMayor
 
 
     def gestionaPokerKnuth(self, ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
@@ -285,7 +300,7 @@ class PokerKnuth(object):
             self.imprime("%s\t%s\t%s" % it)
         self.imprime("")
 
-        self.imprime("mi chi cuadrado temporal es")
+        self.imprime("La discrepancia entre frecuencias esperadas y observadas,  es:")
         self.imprime(chi_cuadrado,"%f")
 
         ### El grado de libertad: k - r - 1 = 5 - 0 - 1 = 4
@@ -294,9 +309,15 @@ class PokerKnuth(object):
 
         cabecera_cuartiles=[]
         tablaChi = self.cargaTablaChiCuadrado( cabecera_cuartiles, self._chi2_file )
-        #map(imprime,cabecera_cuartiles)
+        indiceProbabilidad=self.getCuartil(chi_cuadrado,grado_libertad,tablaChi)
+        probabilidad = cabecera_cuartiles[indiceProbabilidad]
+        self.imprime("Con una probabilidad calculada: ",formato =" %s",end="")
+        self.imprime(probabilidad,formato =" %s ")
+
+        #map(self.imprime,cabecera_cuartiles)
         indice_x1_a = self.getIndiceGradoLibertad(cabecera_cuartiles,probabilidad)
         chi_teorica = tablaChi[grado_libertad-1][indice_x1_a]#los indices inician en 0: grado_libertad-1
+        chi_teorica = float(chi_teorica)
         self.imprime("Con un grado de libertad: ",formato =" %s",end="")
         self.imprime(grado_libertad,formato =" %d ")
         self.imprime("Con una probabilidad: ",formato =" %s",end="")
@@ -327,8 +348,8 @@ class PokerKnuth(object):
             # Cerramos el fichero.
             infile.close()
 
-        return chi_cuadrado, pasa_el_contraste # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
-
+        return chi_cuadrado, chi_teorica # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
+        #return chi_cuadrado, pasa_el_contraste # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
 
 if __name__=='__main__':
     direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
