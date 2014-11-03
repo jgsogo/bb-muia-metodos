@@ -6,6 +6,8 @@ import sys
 
 
 class PokerKnuth(object):
+    _significacion = 0.950 # (5%)
+    _chi2_significacion = 9.488
 
     def __init__(self, chi2_file, verbosity=2):
         self._chi2_file = chi2_file
@@ -42,10 +44,10 @@ class PokerKnuth(object):
             return 8
         elif numero >= 0.8 and numero < 0.9 :
             return 9
-        elif numero >= 0.9 and numero <= 1 : # TODO: ¿numero==1 es un valor válido?
+        elif numero >= 0.9 and numero < 1 : # TODO: ¿numero==1 es un valor válido?
             return 10
         else:
-            raise AttributeError("Value %r not in range [0, 1]" % numero)
+            raise AttributeError("Value %r not in range [0, 1)" % numero)
 
 
     def remueveNApariciones(self, lista,elemento):
@@ -245,6 +247,7 @@ class PokerKnuth(object):
 
 
     def gestionaPokerKnuth(self, ficheroRegistrosNumeros=None,listaRegistrosNumeros=None):
+        self.imprime("")
         infile = None
         lineas = None
         clases = 5
@@ -258,11 +261,17 @@ class PokerKnuth(object):
             self.imprime( "Calculando el Poker_knuth a partir de un fichero como entrada", " %s " )
             infile = open(ficheroRegistrosNumeros, "r");
             lineas = infile.readlines()
+            infile.close()
         elif listaRegistrosNumeros != None :
             self.imprime("Calculando el Poker_Knuth a partir de una lista como entrada"," %s ")
             lineas = listaRegistrosNumeros[:]
 
         numeros = map(float,lineas )
+        if len(numeros) <= 50:
+            raise AttributeError(u"Need at least 50 samples to perform Knuth\'s Poker Test")
+
+        self.imprime(u"Muestra: %s elementos" % len(numeros))
+
         numerosTrans = map(self.transformaEnteros,numeros )
         matriz = self.funcionTroceaLista(clases,numerosTrans)
         listaCategorias = []
@@ -275,7 +284,7 @@ class PokerKnuth(object):
             self.cuentaFrecuencias( categoria, frecuenciasObservadas )
         #imprime("******* Fin categorias ********")
 
-        map( self.imprime , frecuenciasObservadas )
+        #map( self.imprime , frecuenciasObservadas )
 
 
         n_iteraciones = 0
@@ -289,69 +298,68 @@ class PokerKnuth(object):
         data = []
         for frecuenciaCategoria in frecuenciasObservadas:
             frecuenciaEsperadaAux=self.calculaFrecuenciaEsperada(n_iteraciones,i_esima_categoria)
-            chi_cuadrado = (chi_cuadrado +   ((((frecuenciaCategoria - frecuenciaEsperadaAux)) **2) / frecuenciaEsperadaAux ))
 
-            data.append((i_esima_categoria, frecuenciaEsperadaAux, chi_cuadrado))
+            aux_discrepancia = (frecuenciaCategoria - frecuenciaEsperadaAux)**2/float(frecuenciaEsperadaAux)
+            chi_cuadrado += aux_discrepancia
+
+            data.append((i_esima_categoria, frecuenciaCategoria, frecuenciaEsperadaAux, aux_discrepancia))
             i_esima_categoria = (i_esima_categoria+1)
 
-        self.imprime("")
-        self.imprime("Clase\tfreq\tChi")
+        self.imprime("\n=== FRECUENCIAS")
+        self.imprime("Clase\tfreq observada\tfreq esperada\tdiscrepancia")
         for it in data:
-            self.imprime("%s\t%s\t%s" % it)
+            self.imprime("%s\t%s\t\t%s\t\t%s" % it)
         self.imprime("")
+        self.imprime("Discrepancia: %s" % chi_cuadrado)
 
-        self.imprime("La discrepancia entre frecuencias esperadas y observadas,  es:")
-        self.imprime(chi_cuadrado,"%f")
 
         ### El grado de libertad: k - r - 1 = 5 - 0 - 1 = 4
         grado_libertad = clases - 0 - 1
-        probabilidad = "0.995"
+        self.imprime("\n=== TABLA CHI-2")
+        self.imprime("\tGrados de libertad: %s" % grado_libertad)
 
         cabecera_cuartiles=[]
         tablaChi = self.cargaTablaChiCuadrado( cabecera_cuartiles, self._chi2_file )
         indiceProbabilidad=self.getCuartil(chi_cuadrado,grado_libertad,tablaChi)
-        probabilidad = cabecera_cuartiles[indiceProbabilidad]
-        self.imprime("Con una probabilidad calculada: ",formato =" %s",end="")
-        self.imprime(probabilidad,formato =" %s ")
 
-        #map(self.imprime,cabecera_cuartiles)
-        indice_x1_a = self.getIndiceGradoLibertad(cabecera_cuartiles,probabilidad)
-        chi_teorica = tablaChi[grado_libertad-1][indice_x1_a]#los indices inician en 0: grado_libertad-1
-        chi_teorica = float(chi_teorica)
-        self.imprime("Con un grado de libertad: ",formato =" %s",end="")
-        self.imprime(grado_libertad,formato =" %d ")
-        self.imprime("Con una probabilidad: ",formato =" %s",end="")
-        self.imprime(probabilidad,formato =" %s ")
-        self.imprime("mientras que la chi de referencia es ",formato =" %s ",end="")
-        self.imprime(chi_teorica,formato =" %s ")
+        alfa_superior = chi2_superior = None
+        if indiceProbabilidad > 0:
+            # Limite superior:
+            alfa_superior = cabecera_cuartiles[indiceProbabilidad]
+            chi2_superior = tablaChi[ grado_libertad-1 ][indiceProbabilidad]
+            self.imprime(u"\tSignificación superior: alfa=%s (chi2= %s)" % (alfa_superior, chi2_superior))
 
-        pasa_el_contraste = (chi_teorica < chi_cuadrado)
+        # Limite inferior
+        alfa_inferior = cabecera_cuartiles[indiceProbabilidad+1]
+        chi2_inferior = tablaChi[ grado_libertad-1 ][indiceProbabilidad+1]
+        self.imprime(u"\tSignificación inferior: alfa=%s (chi2= %s)" % (alfa_inferior, chi2_inferior))
 
-        self.imprime( "Si chi_teorica < chi_cuadrado, se acepta o no la hipotesis" )
+        self.imprime("\n=== RESULTADOS")
+        self.imprime(u"\tSignificación %r (chi2=%s)" % (self._significacion, self._chi2_significacion))
+        pasa_el_contraste = chi_cuadrado < self._chi2_significacion
 
-        if pasa_el_contraste :
-            #imprime( "Entonces: %f < %f " % chiss )
-            self.imprime( "Entonces: ",formato="%s",end="" )
-            self.imprime(float(chi_teorica),formato="%f",end=" " )
-            self.imprime( " < ",formato="%s",end="" )
-            self.imprime(chi_cuadrado,formato="%f",end="\n" )
-            self.imprime("Se acepta la hipotesis!")
+        self.imprime("")
+        if not pasa_el_contraste:
+            self.imprime(u"RECHAZO la hipótesis con un grado de significación de %s" % self._significacion)
         else:
-            #imprime( "Entonces: %f >= %f " % chiss )
-            self.imprime( "Entonces: ",formato="%s",end="" )
-            self.imprime(float(chi_teorica),formato="%f",end=" " )
-            self.imprime( " >= ",formato="%s",end="" )
-            self.imprime(chi_cuadrado,formato="%f",end="\n" )
-            self.imprime("No se acepta la hipotesis!")
+            self.imprime(u"ACEPTO la hipótesis con un grado de significación de %s" % self._significacion)
+        if alfa_superior:
+            self.imprime(u"Grado de significación mínimo para no rechazar: %s" % (1-float(alfa_superior)))
 
-        if ficheroRegistrosNumeros != None:
-            # Cerramos el fichero.
-            infile.close()
-
-        return chi_cuadrado, chi_teorica # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
+        return chi_cuadrado, pasa_el_contraste
+        #return chi_cuadrado, chi_teorica # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
         #return chi_cuadrado, pasa_el_contraste # Y me devuelves la tupla con el valor calculado y el resultado de si pasa o no el contraste
 
 if __name__=='__main__':
+    chi2_file = "./muia/random/test/tablaChiCuadrado.csv"
+    from muia.random.mersenne_twister_engine import MersenneTwisterEngine
+    generator = MersenneTwisterEngine()
+    data = [generator.random() for i in xrange(250000)]
+
+    poker_knuth = PokerKnuth(chi2_file=chi2_file)
+    poker_knuth.gestionaPokerKnuth(listaRegistrosNumeros=data)
+    exit()
+
     direccion_fichero = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/ejemplos.txt"
     chi2_file = "C:/Users/Jonathan/Google Drive/Master/Metodos de simulacion/practicas/practica 1/poker/tablaChiCuadrado.csv"
 

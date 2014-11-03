@@ -17,6 +17,7 @@ import time
 import sys
 import math
 from muia.random.mersenne_twister_engine import MersenneTwisterEngine, MUIA_MersenneTwisterEngine
+from muia.random.wichmann_engine import WichmannHill
 from muia.random.test.poker_knuth import PokerKnuth
 
 
@@ -37,11 +38,8 @@ def apply_poker_knuth(generator_class, n=5000, n_series=100):
     n_success = sum([it[1] for it in xi2])
 
     sys.stdout.write("\t\t+ succeded : %s/%s times\n" % (n_success, n_xi2))
-    # TODO: ¿Podemos suponer una distribución normal?
-    mean = sum([it[0] for it in xi2])/n_xi2
-    sd = math.sqrt(sum((x[0]-mean)**2 for x in xi2)/n_xi2)
-    sys.stdout.write("\t\t+ mean: %s\n" % (mean))
-    sys.stdout.write("\t\t+ std dev: %s\n" % (sd))
+
+    # TODO: Y xi2 seguiría una distribución xhi2 a su vez
     return xi2
 
 
@@ -60,18 +58,22 @@ def run():
     sys.stdout.write("\n1) Mersenne Twister Engine\n")
     n = 5000
     n_series = 100
+
+
     #   - default random.Random (it's Mersenne since 2.x
     sys.stdout.write("\n\t1.1) Mersenne Twister Engine (default Python implementation)\n")
     r1 = apply_poker_knuth(MersenneTwisterEngine, n=n, n_series=n_series)
     print_results('mersenne_chi2_python.txt', r1)
+
 
     #   - our implementation of Mersenne Twister
     sys.stdout.write("\n\t1.2) Mersenne Twister Engine (implementation MUIA)\n")
     r2 = apply_poker_knuth(MUIA_MersenneTwisterEngine, n=n, n_series=n_series)
     print_results('mersenne_chi2_muia.txt', r2)
 
+
     #   - random numbers generated with C++
-    sys.stdout.write("\n\t1.2) Mersenne Twister Engine C++ (std::mt19937)\n")
+    sys.stdout.write("\n\t1.3) Mersenne Twister Engine C++ (std::mt19937)\n")
     dir_files = './muia/homework/mersenne_c_files/*'
 
     class FilePoker():
@@ -108,7 +110,11 @@ def run():
     r3 = apply_poker_knuth(FilePoker, n=n, n_series=n_series)
     print_results('mersenne_chi2_cpp.txt', r3)
 
+
     # 3) Wichmann-Hill
+    sys.stdout.write("\n\t1.4) Wichmann-Hill Engine (implementation Python)\n")
+    r2 = apply_poker_knuth(WichmannHill, n=n, n_series=n_series)
+    print_results('wichmann-hill_chi2_muia.txt', r2)
 
 
 if __name__ == "__main__":
