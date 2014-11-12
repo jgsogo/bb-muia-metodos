@@ -217,7 +217,7 @@ def run():
     print("="*16)
 
     seed = 12345
-    case_A(seed)
+    case_A(seed, sim_log=False)
     case_B(seed)
     case_C(seed)
 
