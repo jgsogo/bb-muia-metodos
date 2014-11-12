@@ -64,10 +64,12 @@ def mean_stats(data):
     closed_clients = normal_distribution([it['clients']['closed'] for it in data])
     mean_stock = normal_distribution([sum([it2[1] for it2 in it['stock']])/len(it['stock']) for it in data])
     expected_revenue = normal_distribution([it['cash'][-1][1] for it in data])
-    return total_clients, fully_served, closed_clients, mean_stock, expected_revenue
+    t_empty_stock = normal_distribution([it['t_empty_stock'] for it in data])
+    lost_sells = normal_distribution([it['lost_sells'] for it in data])
+    return total_clients, fully_served, closed_clients, mean_stock, expected_revenue, t_empty_stock, lost_sells
 
 
-def case_A(seed):
+def case_A(seed, sim_log=None):
     print("\n\n*** Exercise 1.2.a")
     print("*"*18)
 
@@ -100,9 +102,10 @@ def case_A(seed):
     max_stock = 100
     print("\t - Minimum stock: %s" % minimum_stock)
     print("\t - Maximum stock: %s" % max_stock)
-    #def pp(str):
-    #    print(str)
-    sim = Simulation(clients, provider, store, lambda u: None)
+    def pp(str):
+        if sim_log: print(str)
+        else: pass
+    sim = Simulation(clients, provider, store, pp)
     sim.config(minimum_stock=minimum_stock, max_stock=max_stock)
 
     n_times = 100
@@ -110,14 +113,16 @@ def case_A(seed):
     data = sim.run_repeated(t_end, n_times)
 
     # 5) Print stats
-    total_clients, fully_served, closed_clients, mean_stock, expected_revenue = mean_stats(data)
+    total_clients, fully_served, closed_clients, mean_stock, expected_revenue, t_empty_stock, lost_sells = mean_stats(data)
     print("\n\tStats (simulated %s times)" % n_times)
     print("\t - Hours simulated:\t%s hours" % t_end)
     print("\t - Total clients:\t%s\t(rms=%s)" % (total_clients[0], total_clients[1]))
     print("\t   + fully served:\t%s\t(rms=%s)" % (fully_served[0], fully_served[1]))
     print("\t   + closed clients:\t%s\t(rms=%s)" % (closed_clients[0], closed_clients[1]))
     print("\t - Mean stock:\t%s\t(rms=%s)" % (mean_stock[0], mean_stock[1]))
-    print("\t - Expected revenue:\t%s\t(rms=%s)" % (expected_revenue[0], expected_revenue[1]))
+    print("\t - Expected revenue:\t%s eur\t(rms=%s)" % (expected_revenue[0], expected_revenue[1]))
+    print("\t - Empty stock time:\t%s hours\t(rms=%s)" % (t_empty_stock[0], t_empty_stock[1]))
+    print("\t - Lost sells:\t%s\t(rms=%s)" % (lost_sells[0], lost_sells[1]))
 
 
 def case_B(seed):
@@ -131,6 +136,7 @@ def case_C(seed):
     print("*"*18)
 
     random_engine = MersenneTwisterEngine()
+    random_engine.seed(seed)
     print("\n\tBuild client manager")
     clients = build_client_manager(random_engine)
     print("\n\tBuild provider")
@@ -153,39 +159,44 @@ def case_C(seed):
     max_max_stock = 150
     min_min_stock = 0
 
-    maximum_revenue = (-1, -1, -1, -1, -1)
+    maximum_revenue = (-1, -1, -1, -1, -1, -1, -1, -1)
     #all_data_stock = {}
     f = open('stock_map.txt', 'w')
 
+    print("\n\tSimulate! (%s times each scenario)" % n_times)
     for max_stock in range(min_min_stock, max_max_stock+1, stock_step):
         for min_stock in range(min_min_stock, max_stock+1, stock_step):
             random_engine.seed(seed) # Reset random
             sim.config(minimum_stock=min_stock, max_stock=max_stock)
 
             data = sim.run_repeated(t_end, n_times)
-            total_clients, fully_served, mean_stock, expected_revenue = mean_stats(data)
+            #total_clients, fully_served, mean_stock, expected_revenue = mean_stats(data)
+            total_clients, fully_served, closed_clients, mean_stock, expected_revenue, t_empty_stock, lost_sells = mean_stats(data)
 
             if expected_revenue[0] > maximum_revenue[2]:
-                maximum_revenue = (min_stock, max_stock, expected_revenue[0], fully_served[0], total_clients[0])
+                maximum_revenue = (min_stock, max_stock, expected_revenue[0], fully_served[0], closed_clients[0], total_clients[0], t_empty_stock[0], lost_sells[0])
 
             print("\t - stock: [%s, %s]\t revenue: %s\t stock (mean): %s\t served: %s%%" %
               (min_stock, max_stock,
                "{:2.2f}".format(expected_revenue[0]),
                mean_stock[0],
-               "{:2.2f}".format(fully_served[0]/float(total_clients[0])*100)))
+               "{:2.2f}".format(fully_served[0]/float(total_clients[0]-closed_clients[0])*100)))
 
             #all_data_stock.update({(min_stock, max_stock): data})
-            f.write("%s,%s,%s,%s,%s\n" % (min_stock, max_stock, expected_revenue[0], total_clients[0], fully_served[0]))
+            f.write("%s,%s,%s,%s,%s,%s,%s,%s\n" % (min_stock, max_stock, expected_revenue[0], total_clients[0], fully_served[0], closed_clients[0], t_empty_stock[0], lost_sells[0]))
     print("\tMaximum revenue is %r with stock in [%s, %s]" % ("{:2.2f}".format(maximum_revenue[2]), maximum_revenue[0], maximum_revenue[1]))
     f.close()
 
     # 5) Print stats
     print("\n\tStats (for max_revenue)")
     print("\t - Hours simulated:\t%s hours" % t_end)
-    print("\t - Total clients:\t%s\t(rms=%s)" % (maximum_revenue[4], '~'))
+    print("\t - Total clients:\t%s\t(rms=%s)" % (maximum_revenue[5], '~'))
     print("\t   + fully served:\t%s\t(rms=%s)" % (maximum_revenue[3], '~'))
+    print("\t   + closed clients:\t%s\t(rms=%s)" % (maximum_revenue[4], '~'))
     print("\t - Mean stock:\t%s\t(rms=%s)" % ('~', '~'))
     print("\t - Expected revenue:\t%s\t(rms=%s)" % (maximum_revenue[2], '~'))
+    print("\t - Empty stock time:\t%s hours\t(rms=%s)" % (maximum_revenue[6], '~'))
+    print("\t - Lost sells:\t%s\t(rms=%s)" % (maximum_revenue[7], '~'))
 
     """
     max_stats = all_data_stock[(maximum_revenue[1], maximum_revenue[2])]
@@ -207,8 +218,8 @@ def run():
 
     seed = 12345
     case_A(seed)
-    #case_B(seed)
-    #case_C(seed)
+    case_B(seed)
+    case_C(seed)
 
 
 if __name__ == "__main__":

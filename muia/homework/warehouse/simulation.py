@@ -35,7 +35,9 @@ class Simulation(object):
         self._next_client = None
         self.stats = {'clients': {'total': 0, 'fully_served': 0, 'closed': 0},
                       'stock': [],
-                      'cash': []}
+                      'cash': [],
+                      't_empty_stock': 0,
+                      'lost_sells': 0}
 
     def config(self, minimum_stock, max_stock, opening_hours=8):
         self._minimum_stock = minimum_stock
@@ -109,11 +111,14 @@ class Simulation(object):
 
         # 1) Stock
         self._cash -= self._store._cost_per_unit * self._store.get_stock() * (t_next_event - self._time)
-        self._time = t_next_event
 
         # 2) Stats
         self.stats['stock'].append((self._time, self._store.get_stock()))
         self.stats['cash'].append((self._time, self._cash))
+        self.stats['t_empty_stock'] += 0 if self._store.get_stock() != 0 else (t_next_event - self._time)
+
+        # GO ahead
+        self._time = t_next_event
 
 
     def _handle_client(self, t_client, r_client):
@@ -124,6 +129,8 @@ class Simulation(object):
             self.write("\t\t%s clients buys %s/%s items =>\t stock: %s\t cash: %s eur" % (1, q, r_client, self._store.get_stock(), self._cash))
             if q == r_client:
                 self.stats['clients']['fully_served'] += 1
+            else:
+                self.stats['lost_sells'] += (r_client - q)
         else:
             self.write("\t\t%s clients buys 0/%s items =>\t (closed!)" % (1, r_client, ))
             self.stats['clients']['closed'] += 1
