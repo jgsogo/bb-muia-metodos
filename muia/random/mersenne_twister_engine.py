@@ -98,7 +98,7 @@ class MUIA_MersenneTwisterEngine(random.Random):
 if os.getenv('USES_MUIA'):
     MersenneTwisterEngine = MUIA_MersenneTwisterEngine
 else:
-    # TODO: Check Python version, it may be still using Wichmann-Hill
+    # TODO: Check Python version, it may be still using Wichmann-Hill (Python < 2.3)
     MersenneTwisterEngine = random.Random
 
 
