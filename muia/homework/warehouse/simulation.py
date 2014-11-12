@@ -33,7 +33,7 @@ class Simulation(object):
         self._cash = 0
         self._provider_order = None
         self._next_client = None
-        self.stats = {'clients': {'total': 0, 'fully_served': 0},
+        self.stats = {'clients': {'total': 0, 'fully_served': 0, 'closed': 0},
                       'stock': [],
                       'cash': []}
 
@@ -61,35 +61,37 @@ class Simulation(object):
 
     def get_datetime(self):
         time = self._time + self._zero_hour
-        week_day = (self._time % (24*7)) / 24
-        day_hour = self._time % 24
+        week_day = int((time % (24*7)) / 24)
+        day_hour = int(time % 24)
+        minutes = int(((time % 24) - day_hour)*60)
         return '%s %s' % (['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][int(week_day)],\
-                "{:2.0f}:00".format(day_hour))
+                "{:02.0f}:{:02.0f}".format(day_hour, minutes))
 
     def is_store_open(self):
         # Horarios del almacén
         #   - Apertura: 8 horas al día de lunes a sábado.
-        week_day = (self._time % (24*7)) / 24
-        day_hour = self._time % 24
-        return week_day in xrange(6) and day_hour in xrange(self._opening_hours)
+        time = self._time + self._zero_hour
+        week_day = int((time % (24*7)) / 24)
+        day_hour = int(time % 24)
+        return week_day in xrange(6) and day_hour in xrange(8, 8+self._opening_hours, 1)
 
-    def next(self):
+    def next(self, max_time):
         if self._time == 0:
             self.write("\n\t=== Hour 0 its considered to be %s (opening time)" % self.get_datetime())
 
         is_opened = self.is_store_open()
-        self.write("\t%s %s\thour: %s\t stock: %s\t cash: %s eur" % (('+' if is_opened else '-'), self.get_datetime(), self._time, self._store.get_stock(), self._cash))
+        self.write("\t%s %s\ttime: %s\t stock: %s\t cash: %s eur" % (('+' if is_opened else '-'), self.get_datetime(), self._time, self._store.get_stock(), self._cash))
 
-        # Which is going to happen next?
+        # What is going to happen now?
         if self._provider_order or self._next_client:
             # TODO: Si tuviera una lista ordenada con los eventos en el orden en que se van a ir sucediendo...
             t_provider = self._provider_order[0] if self._provider_order else float("inf")
             t_client = self._next_client[0] if self._next_client else float("inf")
             if t_client < t_provider:
-                self._handle_client(*self._next_client)
+                self._handle_client(t_client=self._next_client[0], r_client=self._next_client[1])
                 self._next_client = None
             elif t_provider < t_client:
-                self._handle_provider(*self._provider_order)
+                self._handle_provider(t_provider=self._provider_order[0], quantity=self._provider_order[1], price=self._provider_order[2])
                 self._provider_order = None
             else:
                 # TODO: Choose at random which one arrives first
@@ -103,7 +105,7 @@ class Simulation(object):
         # Run until next event
         t_provider = self._provider_order[0] if self._provider_order else float("inf")
         t_client = self._next_client[0] if self._next_client else float("inf")
-        t_next_event = min(t_provider, t_client)
+        t_next_event = min(t_provider, t_client, max_time)
 
         # 1) Stock
         self._cash -= self._store._cost_per_unit * self._store.get_stock() * (t_next_event - self._time)
@@ -115,13 +117,16 @@ class Simulation(object):
 
 
     def _handle_client(self, t_client, r_client):
-        self.write("\t\t%s clients buys %s items" % (1, r_client))
-        q = self._store.grab_items(r_client)
-        self._cash += q*self._sell_price
-
         self.stats['clients']['total'] += 1
-        if q == r_client:
-            self.stats['clients']['fully_served'] += 1
+        if self.is_store_open():
+            q = self._store.grab_items(r_client)
+            self._cash += q*self._sell_price
+            self.write("\t\t%s clients buys %s/%s items =>\t stock: %s\t cash: %s eur" % (1, q, r_client, self._store.get_stock(), self._cash))
+            if q == r_client:
+                self.stats['clients']['fully_served'] += 1
+        else:
+            self.write("\t\t%s clients buys 0/%s items =>\t (closed!)" % (1, r_client, ))
+            self.stats['clients']['closed'] += 1
 
     def _handle_provider(self, price, quantity, t_provider):
         self.write("\t\tprovider: q=%s\tprice=%s" % (quantity, price))
@@ -129,17 +134,19 @@ class Simulation(object):
         self._cash -= price
 
     def run(self, max_time):
+        self.reset()
         while self._time < max_time:
-            self.next()
+            self.next(max_time)
+        is_opened = self.is_store_open()
+        self.write("\t%s %s\ttime: %s\t stock: %s\t cash: %s eur" % (('+' if is_opened else '-'), self.get_datetime(), self._time, self._store.get_stock(), self._cash))
+
 
     def run_repeated(self, t_end, n_times):
         # Ejecuta la simulación 'n_times' hasta 't_end' y devuelve un vector con las estadísticas
 
         stats = []
         for i in xrange(n_times):
-            self.reset()
-            for j in xrange(t_end):
-                self.run(t_end)
+            self.run(t_end)
             stats.append(self.stats)
 
         self.reset()

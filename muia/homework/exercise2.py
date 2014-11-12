@@ -61,9 +61,10 @@ def mean_stats(data):
     # 5) Print stats
     total_clients = normal_distribution([it['clients']['total'] for it in data])
     fully_served = normal_distribution([it['clients']['fully_served'] for it in data])
+    closed_clients = normal_distribution([it['clients']['closed'] for it in data])
     mean_stock = normal_distribution([sum([it2[1] for it2 in it['stock']])/len(it['stock']) for it in data])
-    expected_revenue = normal_distribution([sum([it2[1] for it2 in it['cash']])/len(it['cash']) for it in data])
-    return total_clients, fully_served, mean_stock, expected_revenue
+    expected_revenue = normal_distribution([it['cash'][-1][1] for it in data])
+    return total_clients, fully_served, closed_clients, mean_stock, expected_revenue
 
 
 def case_A(seed):
@@ -99,9 +100,9 @@ def case_A(seed):
     max_stock = 100
     print("\t - Minimum stock: %s" % minimum_stock)
     print("\t - Maximum stock: %s" % max_stock)
-    def pp(str):
-        print(str)
-    sim = Simulation(clients, provider, store, pp)
+    #def pp(str):
+    #    print(str)
+    sim = Simulation(clients, provider, store, lambda u: None)
     sim.config(minimum_stock=minimum_stock, max_stock=max_stock)
 
     n_times = 100
@@ -109,11 +110,12 @@ def case_A(seed):
     data = sim.run_repeated(t_end, n_times)
 
     # 5) Print stats
-    total_clients, fully_served, mean_stock, expected_revenue = mean_stats(data)
+    total_clients, fully_served, closed_clients, mean_stock, expected_revenue = mean_stats(data)
     print("\n\tStats (simulated %s times)" % n_times)
     print("\t - Hours simulated:\t%s hours" % t_end)
     print("\t - Total clients:\t%s\t(rms=%s)" % (total_clients[0], total_clients[1]))
     print("\t   + fully served:\t%s\t(rms=%s)" % (fully_served[0], fully_served[1]))
+    print("\t   + closed clients:\t%s\t(rms=%s)" % (closed_clients[0], closed_clients[1]))
     print("\t - Mean stock:\t%s\t(rms=%s)" % (mean_stock[0], mean_stock[1]))
     print("\t - Expected revenue:\t%s\t(rms=%s)" % (expected_revenue[0], expected_revenue[1]))
 
