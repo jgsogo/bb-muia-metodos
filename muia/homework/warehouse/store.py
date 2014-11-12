@@ -17,6 +17,7 @@ class Store(object):
         self._on_stock_change = on_stock_change
 
     def set_cost_per_unit(self, cost_per_unit):
+        # Coste de almacenamiento por unidad de producto
         self._cost_per_unit = cost_per_unit
 
     def get_stock(self):

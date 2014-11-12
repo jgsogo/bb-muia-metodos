@@ -20,10 +20,12 @@ class Provider(object):
         self._order_time_distribution = distribution_class(random_engine=self._engine, **kwargs)
 
     def set_unit_cost(self, fix_cost, unit_price):
+        # Coste por unidad de producto y coste fijo por cada pedido
         self._fix_cost = fix_cost
         self._unit_price = unit_price
 
     def set_offer(self, quatity_gte, unit_price):
+        # Ofertas: coste unitario por cantidad
         self._offers[quatity_gte] = unit_price
 
     def get_unit_price(self, quantity):
@@ -39,7 +41,7 @@ class Provider(object):
         return self._fix_cost + self.get_unit_price(quantity)*quantity
 
     def get_order_time(self):
-        return round(self._order_time_distribution.random()) # TODO: Estoy ajustando al entero más cercano (supongo que mi unidad de tiempo es la hora)
+        return self._order_time_distribution.random()
 
     def get_order(self, quantity):
         price = self.get_order_price(quantity)

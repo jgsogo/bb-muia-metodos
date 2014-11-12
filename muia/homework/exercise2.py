@@ -12,7 +12,7 @@ from .warehouse.store import Store
 from .warehouse.simulation import Simulation
 
 
-def get_client_manager(random_engine):
+def build_client_manager(random_engine):
     client_manager = ClientManager(random_engine)
 
     # Llegada de clientes: proceso de Poisson(0,5)
@@ -26,7 +26,7 @@ def get_client_manager(random_engine):
 
     return client_manager
 
-def get_provider(random_engine):
+def build_provider(random_engine):
     class ProviderAgreement(Provider):
         # Descuento por retraso
         def get_order(self, quantity):
@@ -78,11 +78,11 @@ def case_A(seed):
 
     # 1) Construir el gestor de clientes
     print("\n\tBuild client manager")
-    clients = get_client_manager(random_engine)
+    clients = build_client_manager(random_engine)
 
     # 2) Construir el proveedor
     print("\n\tBuild provider")
-    provider = get_provider(random_engine)
+    provider = build_provider(random_engine)
 
     # 3) Construir el propio almacén
     initial = 70
@@ -99,7 +99,9 @@ def case_A(seed):
     max_stock = 100
     print("\t - Minimum stock: %s" % minimum_stock)
     print("\t - Maximum stock: %s" % max_stock)
-    sim = Simulation(clients, provider, store, lambda u: None)
+    def pp(str):
+        print(str)
+    sim = Simulation(clients, provider, store, pp)
     sim.config(minimum_stock=minimum_stock, max_stock=max_stock)
 
     n_times = 100
@@ -128,9 +130,9 @@ def case_C(seed):
 
     random_engine = MersenneTwisterEngine()
     print("\n\tBuild client manager")
-    clients = get_client_manager(random_engine)
+    clients = build_client_manager(random_engine)
     print("\n\tBuild provider")
-    provider = get_provider(random_engine)
+    provider = build_provider(random_engine)
 
     initial = 70
     cost_per_unit = 0.0001
@@ -203,8 +205,8 @@ def run():
 
     seed = 12345
     case_A(seed)
-    case_B(seed)
-    case_C(seed)
+    #case_B(seed)
+    #case_C(seed)
 
 
 if __name__ == "__main__":
