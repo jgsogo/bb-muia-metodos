@@ -110,19 +110,20 @@ def case_A(seed, sim_log=None):
 
     n_times = 100
     t_end = 5*30*24
+    print("\n\tSimulate %s hours (%s times)" % (t_end, n_times))
     data = sim.run_repeated(t_end, n_times)
 
     # 5) Print stats
     total_clients, fully_served, closed_clients, mean_stock, expected_revenue, t_empty_stock, lost_sells = mean_stats(data)
-    print("\n\tStats (simulated %s times)" % n_times)
-    print("\t - Hours simulated:\t%s hours" % t_end)
-    print("\t - Total clients:\t%s\t(rms=%s)" % (total_clients[0], total_clients[1]))
-    print("\t   + fully served:\t%s\t(rms=%s)" % (fully_served[0], fully_served[1]))
-    print("\t   + closed clients:\t%s\t(rms=%s)" % (closed_clients[0], closed_clients[1]))
-    print("\t - Mean stock:\t%s\t(rms=%s)" % (mean_stock[0], mean_stock[1]))
+    #print("\n\tStats (simulated %s times)" % n_times)
+    print("\t\t\t\t - mean -\t\t- std_dev -")
+    print("\t - Total clients:\t%s\t\t\t(rms=%s)" % (total_clients[0], total_clients[1]))
+    print("\t   + fully served:\t%s\t\t\t(rms=%s)" % (fully_served[0], fully_served[1]))
+    print("\t   + closed clients:\t%s\t\t\t(rms=%s)" % (closed_clients[0], closed_clients[1]))
+    print("\t - Mean stock:\t\t%s\t\t\t(rms=%s)" % (mean_stock[0], mean_stock[1]))
     print("\t - Expected revenue:\t%s eur\t(rms=%s)" % (expected_revenue[0], expected_revenue[1]))
     print("\t - Empty stock time:\t%s hours\t(rms=%s)" % (t_empty_stock[0], t_empty_stock[1]))
-    print("\t - Lost sells:\t%s\t(rms=%s)" % (lost_sells[0], lost_sells[1]))
+    print("\t - Lost sells:\t\t%s\t\t\t(rms=%s)" % (lost_sells[0], lost_sells[1]))
 
 
 def case_B(seed):
@@ -151,8 +152,8 @@ def case_C(seed):
 
 
     # Análisis de sensibilidad de la solución
-    stock_step = 5
-    n_times = 10
+    stock_step = 1
+    n_times = 100
     t_end = 5*30*24
 
     # 1) Playing with stocks
@@ -193,10 +194,10 @@ def case_C(seed):
     print("\t - Total clients:\t%s\t(rms=%s)" % (maximum_revenue[5], '~'))
     print("\t   + fully served:\t%s\t(rms=%s)" % (maximum_revenue[3], '~'))
     print("\t   + closed clients:\t%s\t(rms=%s)" % (maximum_revenue[4], '~'))
-    print("\t - Mean stock:\t%s\t(rms=%s)" % ('~', '~'))
+    print("\t - Mean stock:\t\t%s\t(rms=%s)" % ('~', '~'))
     print("\t - Expected revenue:\t%s\t(rms=%s)" % (maximum_revenue[2], '~'))
     print("\t - Empty stock time:\t%s hours\t(rms=%s)" % (maximum_revenue[6], '~'))
-    print("\t - Lost sells:\t%s\t(rms=%s)" % (maximum_revenue[7], '~'))
+    print("\t - Lost sells:\t\t%s\t(rms=%s)" % (maximum_revenue[7], '~'))
 
     """
     max_stats = all_data_stock[(maximum_revenue[1], maximum_revenue[2])]
