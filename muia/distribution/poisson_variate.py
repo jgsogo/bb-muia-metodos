@@ -10,8 +10,8 @@ class PoissonVariate(Distribution):
 
     def __init__(self, lambd, random_engine):
         super(PoissonVariate, self).__init__(random_engine)
-        self._lambd = lambd
-        self._P = exp(-self._lambd)
+        self._L = lambd
+        self._P = exp(-self._L)
         self._F = self._P
 
     def random(self):
@@ -19,7 +19,7 @@ class PoissonVariate(Distribution):
         k = 0
         while u > self._F:
             k += 1
-            self._P *= self._lambd/k
+            self._P *= self._L/k
             self._F += self._P
         return k
 
