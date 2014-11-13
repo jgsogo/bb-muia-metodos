@@ -8,11 +8,8 @@ class DiscreteVariate(Distribution):
     def __init__(self, prob_list, random_engine):
         super(DiscreteVariate, self).__init__(random_engine)
         self._prob_list = prob_list
-        # TODO: Comprobar que suman 1 las probabilidades
-        # TODO: Ordenar probabilidades de mayor a menor
 
     def random(self):
-        # TODO: Revisar
         u = self._engine.random()
         i = 0
         p = self._prob_list[0][0]
@@ -26,7 +23,7 @@ def test():
     print("Discrete Distribution")
 
     import random
-    prob_list = [(0.1, 1), (0.3, 2), (0.4, 3), (0.2, 4)]
+    prob_list = [(0.4, 2), (0.3, 1), (0.2, 3), (0.1, 4)]
     generator = DiscreteVariate(prob_list, random.Random())
 
     n = 10

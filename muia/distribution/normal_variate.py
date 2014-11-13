@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from math import sqrt, log, pi, cos, sin
 from .base import Distribution
 
 class NormalVariate(Distribution):
@@ -11,16 +12,20 @@ class NormalVariate(Distribution):
         self._sigma = sigma
 
     def random(self):
-        # TODO: Implementar el nuestro propio
-        return self._engine.normalvariate(self._mu, self._sigma)
-
+        u1 = self._engine.random()
+        u2 = self._engine.random()
+        r = sqrt(-2*log(u1))
+        t = 2*pi*u2
+        x = self._mu + self._sigma*r*cos(t)
+        y = self._mu + self._sigma*r*sin(t)
+        return x
 
 def test():
     print("Normal Variate")
 
     import random
-    mu = 0.0
-    sigma = 1.0
+    mu = 48.0
+    sigma = 0.8
     generator = NormalVariate(mu, sigma, random.Random())
 
     n = 1000
