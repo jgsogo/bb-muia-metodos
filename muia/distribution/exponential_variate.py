@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from math import log
 from .base import Distribution
 
 class ExponentialVariate(Distribution):
@@ -10,15 +11,16 @@ class ExponentialVariate(Distribution):
         self._lambd = lambd
 
     def random(self):
-        # TODO: Implementar el nuestro propio
-        return self._engine.expovariate(self._lambd)
+        u = self._engine.random()
+        x = (-1*log(u))/self._lambd
+        return x
 
 
 def test():
     print("Exponential Variate")
 
     import random
-    lambd = 1.0
+    lambd = 0.5
     generator = ExponentialVariate(lambd, random.Random())
 
     n = 10
