@@ -125,6 +125,14 @@ def case_A(seed, sim_log=None):
     print("\t - Expected revenue:\t%s eur\t(rms=%s)" % (expected_revenue[0], expected_revenue[1]))
     print("\t - Empty stock time:\t%s hours\t(rms=%s)" % (t_empty_stock[0], t_empty_stock[1]))
     print("\t - Lost sells:\t\t%s\t\t\t(rms=%s)" % (lost_sells[0], lost_sells[1]))
+    
+    # Para representar el nivel de inventario
+    f = open('stock_map_five_months.txt', 'w')
+    f.write("%s\t\t%s\n" % ("Time", "Stock") )
+    for it in data:
+        for it2 in it['stock']:
+            f.write("%s\t\t%s\n" % (it2[0], it2[1]) )
+    f.close()
 
 
 def case_B(seed):
