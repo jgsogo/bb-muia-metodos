@@ -23,13 +23,13 @@ class NormalVariate(Distribution):
 def test():
     print("Normal Variate")
 
-    import random
+    import random_impl
     mu = 48.0
     sigma = 0.8
-    generator = NormalVariate(mu, sigma, random.Random())
+    generator = NormalVariate(mu, sigma, random_impl.Random())
 
     n = 1000
-    print(" - generate %r random number from N(%r, %r)" % (n, mu, sigma))
+    print(" - generate %r random_impl number from N(%r, %r)" % (n, mu, sigma))
     data = [generator.random() for i in xrange(n)]
     try:
         import matplotlib.pyplot as plt
