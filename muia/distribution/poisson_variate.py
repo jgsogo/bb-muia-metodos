@@ -26,12 +26,12 @@ class PoissonVariate(Distribution):
 def test():
     print("Poisson Distribution")
 
-    import random_impl
+    import random
     lambd = 0.5
-    generator = PoissonVariate(lambd, random_impl.Random())
+    generator = PoissonVariate(lambd, random.Random())
 
     n = 10
-    print(" - generate %r random_impl number from Poisson(%r)" % (n, lambd))
+    print(" - generate %r random number from Poisson(%r)" % (n, lambd))
     i = 0
     while i<n:
         print("\t\t %r" % generator.random())

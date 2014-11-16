@@ -74,7 +74,7 @@ def case_A(seed, sim_log=None):
     print("*"*18)
 
     # 0) Inicializar el generador de números aleatorios
-    print("\n\tInitialize unique random_impl generator: MerseneTwister")
+    print("\n\tInitialize unique random generator: MerseneTwister")
     print("\t - seed: %s" % seed)
     random_engine = MersenneTwisterEngine()
     random_engine.seed(seed)
