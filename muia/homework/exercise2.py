@@ -3,7 +3,7 @@
 
 import math
 
-from muia.random import MersenneTwisterEngine
+from muia.random_impl import MersenneTwisterEngine
 from muia.distribution import PoissonVariate, DiscreteVariate, NormalVariate
 
 from .warehouse.client_manager import ClientManager
@@ -74,7 +74,7 @@ def case_A(seed, sim_log=None):
     print("*"*18)
 
     # 0) Inicializar el generador de números aleatorios
-    print("\n\tInitialize unique random generator: MerseneTwister")
+    print("\n\tInitialize unique random_impl generator: MerseneTwister")
     print("\t - seed: %s" % seed)
     random_engine = MersenneTwisterEngine()
     random_engine.seed(seed)
@@ -103,8 +103,9 @@ def case_A(seed, sim_log=None):
     print("\t - Minimum stock: %s" % minimum_stock)
     print("\t - Maximum stock: %s" % max_stock)
     def pp(str):
-        if sim_log: print(str)
-        else: pass
+        if sim_log:
+            print(str)
+
     sim = Simulation(clients, provider, store, pp)
     sim.config(minimum_stock=minimum_stock, max_stock=max_stock)
 
@@ -167,7 +168,7 @@ def case_C(seed):
     print("\n\tSimulate! (%s times each scenario)" % n_times)
     for max_stock in range(min_min_stock, max_max_stock+1, stock_step):
         for min_stock in range(min_min_stock, max_stock+1, stock_step):
-            random_engine.seed(seed) # Reset random
+            random_engine.seed(seed) # Reset random_impl
             sim.config(minimum_stock=min_stock, max_stock=max_stock)
 
             data = sim.run_repeated(t_end, n_times)
