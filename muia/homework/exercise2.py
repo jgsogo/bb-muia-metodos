@@ -21,7 +21,7 @@ def build_client_manager(random_engine):
     print("\t - Arrivals: poisson distribution with lambda=%r" % lambd)
 
     # Cantidad pedida por cada cliente: muestreo discreta
-    client_manager.set_demand(DiscreteVariate, prob_list=[(0.4, 2), (0.3, 1), (0.2, 3), (0.1, 4)])
+    client_manager.set_demand(DiscreteVariate, prob_list=[(0.3, 1), (0.4, 2), (0.2, 3), (0.1, 4)])
     print("\t - Demand: discrete distribution")
 
     return client_manager
