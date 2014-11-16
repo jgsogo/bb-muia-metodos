@@ -96,7 +96,7 @@ class Simulation(object):
                 self._handle_provider(t_provider=self._provider_order[0], quantity=self._provider_order[1], price=self._provider_order[2])
                 self._provider_order = None
             else:
-                # TODO: Choose at random which one arrives first
+                # TODO: Choose at random_impl which one arrives first
                 raise NotImplementedError("Not implemented")
 
         if not self._next_client:
