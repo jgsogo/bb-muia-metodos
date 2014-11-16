@@ -19,12 +19,12 @@ class ExponentialVariate(Distribution):
 def test():
     print("Exponential Variate")
 
-    import random
+    import random_impl
     lambd = 0.5
-    generator = ExponentialVariate(lambd, random.Random())
+    generator = ExponentialVariate(lambd, random_impl.Random())
 
     n = 10
-    print(" - generate %r random number from Exp(%r)" % (n, lambd))
+    print(" - generate %r random_impl number from Exp(%r)" % (n, lambd))
     i = 0
     while i<n:
         print("\t\t %r" % generator.random())
