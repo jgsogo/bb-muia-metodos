@@ -70,6 +70,7 @@ class Simulation(object):
                 "{:02.0f}:{:02.0f}".format(day_hour, minutes))
 
     def is_store_open(self):
+        return True # TODO: Según el profesor: el almacén siempre está abierto porque sólo simulamos las horas en que está abierto!!
         # Horarios del almacén
         #   - Apertura: 8 horas al día de lunes a sábado.
         time = self._time + self._zero_hour

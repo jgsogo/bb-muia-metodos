@@ -110,7 +110,7 @@ def case_A(seed, sim_log=None):
     sim.config(minimum_stock=minimum_stock, max_stock=max_stock)
 
     n_times = 100
-    t_end = 5*30*24
+    t_end = 5*30*8 # TODO: Según el profesor sólo simulamos las horas que está abierto el almacén!!!!
     print("\n\tSimulate %s hours (%s times)" % (t_end, n_times))
     data = sim.run_repeated(t_end, n_times)
 
