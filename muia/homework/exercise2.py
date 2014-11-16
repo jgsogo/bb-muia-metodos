@@ -161,13 +161,16 @@ def case_C(seed):
     max_max_stock = 150
     min_min_stock = 0
 
+    max_min_stock = 0
+    min_max_stock = 0
+
     maximum_revenue = (-1, -1, -1, -1, -1, -1, -1, -1)
     #all_data_stock = {}
     f = open('stock_map.txt', 'w')
 
     print("\n\tSimulate! (%s times each scenario)" % n_times)
-    for max_stock in range(min_min_stock, max_max_stock+1, stock_step):
-        for min_stock in range(min_min_stock, max_stock+1, stock_step):
+    for max_stock in range(max_min_stock, max_max_stock+1, stock_step):
+        for min_stock in range(min_min_stock, min(min_max_stock, max_stock+1), stock_step):
             random_engine.seed(seed) # Reset random_impl
             sim.config(minimum_stock=min_stock, max_stock=max_stock)
 
