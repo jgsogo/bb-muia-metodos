@@ -17,15 +17,15 @@ def run():
     sys.stdout.write(u"\nIntegración de Monte Carlo\n")
     f = lambda u: (u*u + 2*math.cos(u))
 
-    random_engine = MersenneTwisterEngine()
+    random_engine = MersenneTwisterEngine(12345)
     alpha = 3
     beta = 2
     gamma = GammaVariate(alpha, beta, random_engine)
 
     results = open("exercise3.txt", "w")
-    n_results = 1000 # Número de puntos que queremos que saque en el archivo
+    n = 1000 # Número de iteraciones sobre la integral.
+    n_results = min(1000, n) # Número de puntos que queremos que saque en el archivo
 
-    n = 1000000 # Número de iteraciones sobre la integral.
 
     mod_results = int(n/float(n_results))
     sum = 0
